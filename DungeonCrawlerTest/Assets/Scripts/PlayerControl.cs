@@ -344,4 +344,11 @@ public class PlayerControl : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos.position, attackRange); // Visualize the attack range
     }
+
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.CompareTag("Object"))
+            Destroy(col.gameObject);
+    }
 }
