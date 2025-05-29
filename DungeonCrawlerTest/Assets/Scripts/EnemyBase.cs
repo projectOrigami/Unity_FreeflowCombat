@@ -5,9 +5,11 @@ public class EnemyBase : MonoBehaviour
 {
     [SerializeField] private GameObject hitVfx;
     [SerializeField] private GameObject activeTargetObject;
+    [SerializeField] private GameObject toFire;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float fireRadius = 10f; // <-- Radius for firing
 
     private Healthbar healthbar;
-
     private PlayerControl player;
 
     private void Start()
@@ -18,47 +20,54 @@ public class EnemyBase : MonoBehaviour
         ActiveTarget(false);
         InvokeRepeating(nameof(Fire), 1f, 1f);
     }
+
     private void Update()
     {
-        FaceThis(player.transform.position);
-
-        /*if (Input.GetKeyDown(KeyCode.F))
-            Fire();*/
+        if (player != null)
+            FaceThis(player.transform.position);
     }
 
-    public void SpawnHitVfx(Vector3 Pos_)
+    public void SpawnHitVfx(Vector3 pos)
     {
-        Instantiate(hitVfx, Pos_, Quaternion.identity);
+        Instantiate(hitVfx, pos, Quaternion.identity);
 
         healthbar.UpdateHealth(-5, (healthEmpty) =>
         {
             if (healthEmpty)
                 gameObject.SetActive(false);
-        }); // temp
+        });
     }
 
-    public void ActiveTarget(bool bool_)
+    public void ActiveTarget(bool state)
     {
-        activeTargetObject.SetActive(bool_);
+        activeTargetObject.SetActive(state);
     }
 
     public void FaceThis(Vector3 target)
     {
-        Vector3 target_ = new Vector3(target.x, target.y, target.z);
-        Quaternion lookAtRotation = Quaternion.LookRotation(target_ - transform.position);
-        lookAtRotation.x = 0;
-        lookAtRotation.z = 0;
-        transform.rotation = lookAtRotation;
+        Vector3 direction = target - transform.position;
+        direction.y = 0f; // keep y-rotation flat
+        if (direction != Vector3.zero)
+            transform.rotation = Quaternion.LookRotation(direction);
     }
-
-   
-    [SerializeField] private GameObject toFire;
-    [SerializeField] private Transform firePoint;
 
     public void Fire()
     {
-        Transform hitObject = Instantiate(toFire, firePoint).transform;
-        hitObject.SetParent(null);
-        hitObject.DOMove(player.transform.position, 0.5f).SetEase(Ease.Linear);
+        if (player == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        if (distanceToPlayer <= fireRadius)
+        {
+            Transform hitObject = Instantiate(toFire, firePoint.position, Quaternion.identity).transform;
+            hitObject.DOMove(player.transform.position, 0.5f).SetEase(Ease.Linear);
+        }
+    }
+
+    // Optional: show radius in editor
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, fireRadius);
     }
 }
