@@ -45,7 +45,7 @@ public class TargetDetectionControl : MonoBehaviour
     private void PopulateTargetInScene()
     {
         // Find all active GameObjects in the scene
-        EnemyBase[] allGameObjects = FindObjectsOfType<EnemyBase>();
+        EnemyBase[] allGameObjects = FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
 
         // Convert the array to a list
         List<EnemyBase> gameObjectList = new List<EnemyBase>(allGameObjects);
@@ -105,6 +105,9 @@ public class TargetDetectionControl : MonoBehaviour
 
         foreach (Transform enemy in allTargetsInScene)
         {
+            if (!enemy.gameObject.activeSelf)
+                continue; //! temp
+
             Vector3 enemyDirection = (enemy.position - transform.position).normalized;
             float dotProduct = Vector3.Dot(inputDirection, enemyDirection);
 
