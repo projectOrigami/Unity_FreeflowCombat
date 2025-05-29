@@ -16,13 +16,14 @@ public class EnemyBase : MonoBehaviour
         player = FindFirstObjectByType<PlayerControl>();
 
         ActiveTarget(false);
+        InvokeRepeating(nameof(Fire), 1f, 1f);
     }
     private void Update()
     {
         FaceThis(player.transform.position);
 
-        if (Input.GetKeyDown(KeyCode.F))
-            Fire();
+        /*if (Input.GetKeyDown(KeyCode.F))
+            Fire();*/
     }
 
     public void SpawnHitVfx(Vector3 Pos_)
@@ -50,7 +51,7 @@ public class EnemyBase : MonoBehaviour
         transform.rotation = lookAtRotation;
     }
 
-    // fire logic
+   
     [SerializeField] private GameObject toFire;
     [SerializeField] private Transform firePoint;
 
